@@ -892,11 +892,6 @@ function closeDocs() {
 
 document.getElementById("docsNavItem").addEventListener("click", openDocs);
 document.getElementById("driveNavItem").addEventListener("click", () => {
-  window.open(
-    "https://drive.google.com/drive/folders/1sD0Atg6OMmPXkFoir0URL8BafrjOYwf1?usp=sharing",
-    "_blank",
-    "noopener"
-  );
   sidebar.classList.remove("open");
 });
 document.getElementById("teamNavItem").addEventListener("click", openTeam);

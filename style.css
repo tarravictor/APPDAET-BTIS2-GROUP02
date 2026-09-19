@@ -114,6 +114,8 @@ button {
   border-radius: 8px;
   text-align: left;
   font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .nav-item:hover,
