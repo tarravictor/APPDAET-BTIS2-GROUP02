@@ -284,10 +284,21 @@
       </div>
       <div class="docs-tabs" id="docsTabs"></div>
       <div class="docs-body">
+        <div class="docs-toolbar">
+          <div class="docs-zoom-group">
+            <button type="button" class="docs-zoom-button" id="docsZoomOut" title="Zoom out" aria-label="Zoom out">−</button>
+            <span class="docs-zoom-label" id="docsZoomLabel">100%</span>
+            <button type="button" class="docs-zoom-button" id="docsZoomIn" title="Zoom in" aria-label="Zoom in">+</button>
+          </div>
+          <button type="button" class="docs-reset-button" id="docsZoomReset" title="Reset zoom" aria-label="Reset zoom">Reset</button>
+          <button type="button" class="docs-open-button" id="docsOpen" title="Open in a new tab" aria-label="Open document in a new tab">Open ↗</button>
+        </div>
         <div class="docs-placeholder hidden" id="docsPlaceholder">
           <p>Could not load the document.</p>
         </div>
-        <iframe id="docsFrame" class="docs-frame" title="Project document" allowfullscreen></iframe>
+        <div class="docs-viewer">
+          <iframe id="docsFrame" class="docs-frame" title="Project document" allowfullscreen></iframe>
+        </div>
       </div>
     </div>
   </div>

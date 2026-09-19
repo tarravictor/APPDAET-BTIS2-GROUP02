@@ -101,7 +101,6 @@ const state = {
   liveMode: Boolean(supabaseClient),
   subscribed: false,
   members: [],
-  membersLive: Boolean(supabaseClient),
   membersSubscribed: false
 };
 
@@ -217,24 +216,9 @@ function saveTasks() {
   saveLocalTasks();
 }
 
-function loadLocalMembers() {
-  try {
-    const raw = localStorage.getItem("appdaetMembers");
-    if (raw) return JSON.parse(raw);
-  } catch (error) {
-    console.warn("Could not read local members:", error);
-  }
-  return defaultMembers;
-}
-
-function saveLocalMembers() {
-  localStorage.setItem("appdaetMembers", JSON.stringify(state.members));
-}
-
 async function loadMembers() {
   if (!supabaseClient) {
-    state.membersLive = false;
-    state.members = loadLocalMembers();
+    state.members = defaultMembers.map(m => ({ ...m }));
     renderTeamSidebar();
     return;
   }
@@ -246,8 +230,6 @@ async function loadMembers() {
       .order("created_at");
 
     if (error) throw error;
-
-    state.membersLive = true;
 
     if (!data || data.length === 0) {
       const { error: seedError } = await supabaseClient
@@ -267,9 +249,8 @@ async function loadMembers() {
     renderTeamSidebar();
     subscribeMembers();
   } catch (error) {
-    console.warn("Team roles unavailable, using local roster:", error);
-    state.membersLive = false;
-    state.members = loadLocalMembers();
+    console.warn("Team roles unavailable:", error);
+    state.members = defaultMembers.map(m => ({ ...m }));
     renderTeamSidebar();
   }
 }
@@ -326,6 +307,7 @@ function renderTeamModal() {
 function openTeam() {
   renderTeamModal();
   teamModal.classList.remove("hidden");
+  sidebar.classList.remove("open");
 }
 
 function closeTeam() {
@@ -345,34 +327,34 @@ function saveTeamRoles() {
     changed = true;
     member.role = role;
 
-    if (state.membersLive && supabaseClient) {
-      if (member.id) {
-        supabaseClient
-          .from("team_members")
-          .update({ role })
-          .eq("id", member.id)
-          .then(({ error }) => {
-            if (error) console.warn("Could not update role:", error);
-          });
-      } else {
-        supabaseClient
-          .from("team_members")
-          .upsert({ initials: member.initials, name: member.name, role }, { onConflict: "initials" })
-          .then(({ error }) => {
-            if (error) console.warn("Could not save role:", error);
-          });
-      }
+    if (!supabaseClient) return;
+
+    if (member.id) {
+      supabaseClient
+        .from("team_members")
+        .update({ role })
+        .eq("id", member.id)
+        .then(({ error }) => {
+          if (error) console.warn("Could not update role:", error);
+        });
+    } else {
+      supabaseClient
+        .from("team_members")
+        .upsert({ initials: member.initials, name: member.name, role }, { onConflict: "initials" })
+        .then(({ error }) => {
+          if (error) console.warn("Could not save role:", error);
+        });
     }
   });
 
   if (changed) {
-    if (!(state.membersLive && supabaseClient)) saveLocalMembers();
     renderTeamSidebar();
     toast(
-      state.membersLive
-        ? "Roles saved — everyone can see them."
-        : "Roles saved on this browser only."
+      supabaseClient
+        ? "Roles saved — everyone sees the same roster."
+        : "Demo mode — no database connected, roles won't be saved."
     );
+    closeTeam();
   } else {
     toast("No changes to save.");
   }
@@ -457,6 +439,13 @@ function render() {
           ${escapeHtml(task.assignee)}
         </span>
       </div>
+
+      <select class="card-status-move" aria-label="Move to status">
+        <option value="todo"${task.status === "todo" ? " selected" : ""}>To Do</option>
+        <option value="progress"${task.status === "progress" ? " selected" : ""}>In Progress</option>
+        <option value="review"${task.status === "review" ? " selected" : ""}>In Review</option>
+        <option value="done"${task.status === "done" ? " selected" : ""}>Done</option>
+      </select>
     `;
 
     card.addEventListener("dragstart", () => {
@@ -471,6 +460,10 @@ function render() {
       event.preventDefault();
       event.stopPropagation();
       deleteTask(task);
+    });
+
+    card.querySelector(".card-status-move").addEventListener("change", (event) => {
+      moveTask(task, event.target.value);
     });
 
     const list = lists[task.status];
@@ -498,6 +491,31 @@ function updateCounts() {
   document.getElementById("doneCount").textContent = counts.done;
 }
 
+function moveTask(task, newStatus) {
+  if (!task || task.status === newStatus) return;
+
+  const previousStatus = task.status;
+  task.status = newStatus;
+  render();
+
+  if (state.liveMode && supabaseClient) {
+    supabaseClient
+      .from("tasks")
+      .update({ status: newStatus })
+      .eq("id", task.id)
+      .then(({ error }) => {
+        if (error) {
+          console.warn("Could not update status:", error);
+          task.status = previousStatus;
+          render();
+          toast("Could not update status. Check your connection.");
+        }
+      });
+  } else {
+    saveTasks();
+  }
+}
+
 document.querySelectorAll(".column").forEach(column => {
   column.addEventListener("dragover", event => {
     event.preventDefault();
@@ -516,32 +534,10 @@ document.querySelectorAll(".column").forEach(column => {
     if (!draggingCard) return;
 
     const taskId = draggingCard.dataset.id;
-    const newStatus = column.dataset.status;
     const task = state.tasks.find(task => String(task.id) === String(taskId));
     if (!task) return;
 
-    if (task.status === newStatus) return;
-
-    const previousStatus = task.status;
-    task.status = newStatus;
-    render();
-
-    if (state.liveMode && supabaseClient) {
-      supabaseClient
-        .from("tasks")
-        .update({ status: newStatus })
-        .eq("id", task.id)
-        .then(({ error }) => {
-          if (error) {
-            console.warn("Could not update status:", error);
-            task.status = previousStatus;
-            render();
-            toast("Could not update status. Check your connection.");
-          }
-        });
-    } else {
-      saveTasks();
-    }
+    moveTask(task, column.dataset.status);
   });
 });
 
@@ -709,14 +705,50 @@ if (customDocUrl && !CONFIG_DOCS_URL.includes("YOUR_DOC_ID")) {
   repoDocs.push({ label: "Google Doc", file: customDocUrl });
 }
 
+let currentDocUrl = "";
+
 function loadDoc(file, index) {
+  currentDocUrl = file.startsWith("http") ? file : repoFileUrl(file);
   docsFrame.classList.remove("hidden");
   docsPlaceholder.classList.add("hidden");
-  docsFrame.src = file.startsWith("http") ? file : repoFileUrl(file);
+  docsFrame.src = currentDocUrl;
   document.querySelectorAll(".docs-tab").forEach((tab, i) => {
     tab.classList.toggle("active", i === index);
   });
 }
+
+const docsZoomOut = document.getElementById("docsZoomOut");
+const docsZoomIn = document.getElementById("docsZoomIn");
+const docsZoomReset = document.getElementById("docsZoomReset");
+const docsZoomLabel = document.getElementById("docsZoomLabel");
+const docsOpen = document.getElementById("docsOpen");
+
+const DOCS_ZOOM_MIN = 0.5;
+const DOCS_ZOOM_MAX = 3;
+const DOCS_ZOOM_STEP = 0.25;
+let docsZoom = 1;
+
+function updateDocsZoomControls() {
+  docsZoomLabel.textContent = `${Math.round(docsZoom * 100)}%`;
+  docsZoomOut.disabled = docsZoom <= DOCS_ZOOM_MIN;
+  docsZoomIn.disabled = docsZoom >= DOCS_ZOOM_MAX;
+  docsZoomReset.disabled = docsZoom === 1;
+  docsOpen.disabled = !currentDocUrl;
+}
+
+function setDocsZoom(value) {
+  docsZoom = Math.min(DOCS_ZOOM_MAX, Math.max(DOCS_ZOOM_MIN, value));
+  docsFrame.style.zoom = docsZoom;
+  updateDocsZoomControls();
+}
+
+docsZoomOut.addEventListener("click", () => setDocsZoom(docsZoom - DOCS_ZOOM_STEP));
+docsZoomIn.addEventListener("click", () => setDocsZoom(docsZoom + DOCS_ZOOM_STEP));
+docsZoomReset.addEventListener("click", () => setDocsZoom(1));
+
+docsOpen.addEventListener("click", () => {
+  if (currentDocUrl) window.open(currentDocUrl, "_blank", "noopener");
+});
 
 function renderDocsTabs() {
   docsTabs.innerHTML = "";
@@ -736,6 +768,8 @@ function openDocs() {
   docsModal.classList.remove("hidden");
   renderDocsTabs();
   loadDoc(repoDocs[0].file, 0);
+  updateDocsZoomControls();
+  sidebar.classList.remove("open");
 }
 
 function closeDocs() {
