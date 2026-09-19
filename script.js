@@ -991,7 +991,7 @@ const privacyContent = `
   <p>This website is the shared kanban board for the <strong>APPDAET-BTIS2-GROUP2</strong> academic project. This Privacy Policy explains what information the site handles, where it is stored, and the rights you have under Philippine law.</p>
 
   <h4>Data Privacy Act of 2012 (Republic Act No. 10173)</h4>
-  <p>The project respects your privacy and observes the principles of the <strong>Data Privacy Act of 2012 (R.A. 10173)</strong> — transparency, legitimate purpose, and proportionality in the collection and processing of personal data. By using this website, you consent to the handling of data described below.</p>
+  <p>The project respects your privacy and observes the principles of the <strong><a href="https://privacy.gov.ph/data-privacy-act/" target="_blank" rel="noopener">Data Privacy Act of 2012 (R.A. 10173)</a></strong> — transparency, legitimate purpose, and proportionality in the collection and processing of personal data. By using this website, you consent to the handling of data described below.</p>
 
   <h4>What data this website collects</h4>
   <ul>
