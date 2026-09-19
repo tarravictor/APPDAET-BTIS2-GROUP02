@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>APPDAET-BTIS2-GROUP2 | Project Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">A2</div>
+        <div>
+          <h1>APPDAET</h1>
+          <span>BTIS2 • GROUP 2</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active">
+          <span class="nav-icon">▦</span>
+          Board
+        </button>
+        <button class="nav-item">
+          <span class="nav-icon">☰</span>
+          Backlog
+        </button>
+        <button class="nav-item">
+          <span class="nav-icon">⌁</span>
+          Timeline
+        </button>
+        <button class="nav-item">
+          <span class="nav-icon">✓</span>
+          Issues
+        </button>
+        <button class="nav-item">
+          <span class="nav-icon">⚙</span>
+          Project Settings
+        </button>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+
+      <div class="team-box">
+        <p>PROJECT TEAM</p>
+        <div class="avatar-row">
+          <div class="avatar avatar-a">VT</div>
+          <div class="avatar avatar-b">MY</div>
+          <div class="avatar avatar-c">M3</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="menu-button" id="menuButton" aria-label="Toggle sidebar">☰</button>
+
+        <div class="breadcrumbs">
+          <span>Projects</span>
+          <span>/</span>
+          <strong>APPDAET-BTIS2-GROUP2</strong>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="icon-button" id="themeButton" title="Toggle theme">☾</button>
+          <button class="primary-button" id="createTaskButton">+ Create</button>
+          <div class="profile-avatar">VT</div>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <div class="project-heading">
+          <div>
+            <span class="eyebrow">Software Project</span>
+            <h2>APPDAET-BTIS2-GROUP2</h2>
+            <p>Kanban board for tracking tasks, features, bugs, and project progress.</p>
+          </div>
+          <div class="heading-actions">
+            <button class="secondary-button">Share</button>
+            <button class="secondary-button">•••</button>
+          </div>
+        </div>
+
+        <div class="setup-banner hidden" id="setupBanner">
+          <span>⚠</span>
+          <span>Running in <strong>demo mode</strong> — the online database isn't connected, so changes are only saved in this browser.</span>
+        </div>
+
+        <div class="board-toolbar">
+          <div class="search-wrap">
+            <span class="search-icon">⌕</span>
+            <input id="searchInput" type="text" placeholder="Search issues" />
+          </div>
+
+          <div class="member-filter">
+            <div class="mini-avatar">VT</div>
+            <div class="mini-avatar">MY</div>
+            <div class="mini-avatar">M3</div>
+          </div>
+
+          <select id="priorityFilter" class="filter-select">
+            <option value="all">All priorities</option>
+            <option value="High">High priority</option>
+            <option value="Medium">Medium priority</option>
+            <option value="Low">Low priority</option>
+          </select>
+
+          <button class="secondary-button" id="clearFilters">Clear filters</button>
+        </div>
+
+        <div class="summary-grid">
+          <article class="summary-card">
+            <span>Total Issues</span>
+            <strong id="totalCount">0</strong>
+          </article>
+          <article class="summary-card">
+            <span>To Do</span>
+            <strong id="todoCount">0</strong>
+          </article>
+          <article class="summary-card">
+            <span>In Progress</span>
+            <strong id="progressCount">0</strong>
+          </article>
+          <article class="summary-card">
+            <span>Completed</span>
+            <strong id="doneCount">0</strong>
+          </article>
+        </div>
+
+        <div class="board" id="board">
+          <section class="column" data-status="todo">
+            <div class="column-header">
+              <div>
+                <span class="status-dot todo-dot"></span>
+                <h3>TO DO</h3>
+                <span class="count-badge" data-count="todo">0</span>
+              </div>
+              <button class="column-menu">•••</button>
+            </div>
+            <div class="card-list" id="todoList"></div>
+            <button class="add-card-button" data-add="todo">+ Add issue</button>
+          </section>
+
+          <section class="column" data-status="progress">
+            <div class="column-header">
+              <div>
+                <span class="status-dot progress-dot"></span>
+                <h3>IN PROGRESS</h3>
+                <span class="count-badge" data-count="progress">0</span>
+              </div>
+              <button class="column-menu">•••</button>
+            </div>
+            <div class="card-list" id="progressList"></div>
+            <button class="add-card-button" data-add="progress">+ Add issue</button>
+          </section>
+
+          <section class="column" data-status="review">
+            <div class="column-header">
+              <div>
+                <span class="status-dot review-dot"></span>
+                <h3>IN REVIEW</h3>
+                <span class="count-badge" data-count="review">0</span>
+              </div>
+              <button class="column-menu">•••</button>
+            </div>
+            <div class="card-list" id="reviewList"></div>
+            <button class="add-card-button" data-add="review">+ Add issue</button>
+          </section>
+
+          <section class="column" data-status="done">
+            <div class="column-header">
+              <div>
+                <span class="status-dot done-dot"></span>
+                <h3>DONE</h3>
+                <span class="count-badge" data-count="done">0</span>
+              </div>
+              <button class="column-menu">•••</button>
+            </div>
+            <div class="card-list" id="doneList"></div>
+            <button class="add-card-button" data-add="done">+ Add issue</button>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="taskModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">New Issue</span>
+          <h3>Create task</h3>
+        </div>
+        <button class="modal-close" id="closeModal">×</button>
+      </div>
+
+      <form id="taskForm">
+        <label>
+          Task title
+          <input id="taskTitle" required maxlength="80" placeholder="e.g. Finalize dashboard layout" />
+        </label>
+
+        <div class="form-grid">
+          <label>
+            Type
+            <select id="taskType">
+              <option>Task</option>
+              <option>Story</option>
+              <option>Bug</option>
+            </select>
+          </label>
+
+          <label>
+            Priority
+            <select id="taskPriority">
+              <option>Medium</option>
+              <option>High</option>
+              <option>Low</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Status
+            <select id="taskStatus">
+              <option value="todo">To Do</option>
+              <option value="progress">In Progress</option>
+              <option value="review">In Review</option>
+              <option value="done">Done</option>
+            </select>
+          </label>
+
+          <label>
+            Assignee
+            <select id="taskAssignee">
+              <option value="VT">Victor</option>
+              <option value="MY">Maryloe</option>
+              <option value="M3">Member 3</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Description
+          <textarea id="taskDescription" rows="4" placeholder="Add a short description"></textarea>
+        </label>
+
+        <div class="modal-actions">
+          <button type="button" class="secondary-button" id="cancelModal">Cancel</button>
+          <button type="submit" class="primary-button">Create issue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
