@@ -730,6 +730,34 @@ body.dark .setup-banner {
   flex-shrink: 0;
 }
 
+.docs-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.docs-tab {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.docs-tab:hover {
+  border-color: var(--primary);
+}
+
+.docs-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
 .docs-body {
   flex: 1;
   min-height: 0;

@@ -681,6 +681,7 @@ if (!supabaseClient) {
 const docsModal = document.getElementById("docsModal");
 const docsFrame = document.getElementById("docsFrame");
 const docsPlaceholder = document.getElementById("docsPlaceholder");
+const docsTabs = document.getElementById("docsTabs");
 
 const teamModal = document.getElementById("teamModal");
 
@@ -693,17 +694,43 @@ function docsEmbedUrl(url) {
   return url;
 }
 
+const repoDocs = [
+  { label: "APPDAET Plan", file: "APPDAET PLAN.pdf" },
+  { label: "Coding Challenge 4", file: "Coding Challenge 4.pdf" }
+];
+
+const customDocUrl = docsEmbedUrl(CONFIG_DOCS_URL);
+if (customDocUrl && !CONFIG_DOCS_URL.includes("YOUR_DOC_ID")) {
+  repoDocs.push({ label: "Google Doc", file: customDocUrl });
+}
+
+function loadDoc(file, index) {
+  docsFrame.classList.remove("hidden");
+  docsPlaceholder.classList.add("hidden");
+  docsFrame.src = encodeURI(file);
+  document.querySelectorAll(".docs-tab").forEach((tab, i) => {
+    tab.classList.toggle("active", i === index);
+  });
+}
+
+function renderDocsTabs() {
+  docsTabs.innerHTML = "";
+  repoDocs.forEach((doc, index) => {
+    const tab = document.createElement("button");
+    tab.type = "button";
+    tab.className = "docs-tab" + (index === 0 ? " active" : "");
+    tab.textContent = doc.label;
+    tab.addEventListener("click", () => {
+      loadDoc(doc.file, index);
+    });
+    docsTabs.appendChild(tab);
+  });
+}
+
 function openDocs() {
   docsModal.classList.remove("hidden");
-  const embedUrl = docsEmbedUrl(CONFIG_DOCS_URL);
-  if (embedUrl) {
-    docsFrame.src = embedUrl;
-    docsFrame.classList.remove("hidden");
-    docsPlaceholder.classList.add("hidden");
-  } else {
-    docsFrame.classList.add("hidden");
-    docsPlaceholder.classList.remove("hidden");
-  }
+  renderDocsTabs();
+  loadDoc(repoDocs[0].file, 0);
 }
 
 function closeDocs() {

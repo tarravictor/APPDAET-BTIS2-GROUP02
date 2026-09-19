@@ -55,7 +55,7 @@ git push -u origin main
 - **Move** — drag cards between columns; statuses save to Supabase instantly.
 - **Filter** — search by text or filter by priority; "Clear filters" resets.
 - **Delete** — hover a card and click the ✕ (asks for confirmation).
-- **Docs** — the "Docs" item in the sidebar opens an embedded Google Docs view (edit `GOOGLE_DOCS_URL` in `config.js` with your shared-document link).
+- **Docs** — the "Docs" item in the sidebar opens the shared files (kept in the repo): switch between **APPDAET Plan** and **Coding Challenge 4** PDFs with the tabs; a custom Google Docs link can be added via `GOOGLE_DOCS_URL` in `config.js`.
 - **Team roles** — open **Team** in the sidebar (or "Edit roles") and set each member's role; it's saved to the shared board so everyone sees the same roster.
 - **Dark mode** — ☾ in the top bar (remembered on your device).
 
