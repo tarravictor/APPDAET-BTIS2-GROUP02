@@ -75,7 +75,8 @@ const defaultMembers = [
   { initials: "VT", name: "Victor", role: "Project Manager" },
   { initials: "EM", name: "Ethan M", role: "Developer" },
   { initials: "EJ", name: "Ethan J", role: "Designer" },
-  { initials: "RN", name: "Rain", role: "QA / Reviewer" }
+  { initials: "RN", name: "Rain", role: "QA / Reviewer" },
+  { initials: "JO", name: "Joaquin", role: "Developer" }
 ];
 
 const CONFIG_URL = typeof SUPABASE_URL === "string" ? SUPABASE_URL : "";
@@ -232,6 +233,9 @@ async function loadMembers() {
 
     if (error) throw error;
 
+    const present = new Set((data || []).map(m => m.initials));
+    const missing = defaultMembers.filter(m => !present.has(m.initials));
+
     if (!data || data.length === 0) {
       const { error: seedError } = await supabaseClient
         .from("team_members")
@@ -239,7 +243,19 @@ async function loadMembers() {
       if (seedError) throw seedError;
       state.members = defaultMembers.map(m => ({ ...m }));
     } else {
-      state.members = data.map(row => ({
+      if (missing.length > 0) {
+        const { error: addError } = await supabaseClient
+          .from("team_members")
+          .upsert(missing, { onConflict: "initials", ignoreDuplicates: true });
+        if (addError) throw addError;
+        const { data: fresh, error: freshError } = await supabaseClient
+          .from("team_members")
+          .select("*")
+          .order("created_at");
+        if (freshError) throw freshError;
+        data = fresh;
+      }
+      state.members = (data || []).map(row => ({
         id: row.id,
         initials: row.initials,
         name: row.name,
@@ -270,7 +286,7 @@ function subscribeMembers() {
 }
 
 function avatarColor(initials) {
-  const map = { VT: "avatar-a", EM: "avatar-b", EJ: "avatar-c", RN: "avatar-d" };
+  const map = { VT: "avatar-a", EM: "avatar-b", EJ: "avatar-c", RN: "avatar-d", JO: "avatar-e" };
   return map[initials] || "avatar-d";
 }
 

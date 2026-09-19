@@ -58,5 +58,6 @@ insert into public.team_members (initials, name, role) values
   ('VT', 'Victor', 'Project Manager'),
   ('EM', 'Ethan M', 'Developer'),
   ('EJ', 'Ethan J', 'Designer'),
-  ('RN', 'Rain', 'QA / Reviewer')
+  ('RN', 'Rain', 'QA / Reviewer'),
+  ('JO', 'Joaquin', 'Developer')
 on conflict (initials) do nothing;
