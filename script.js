@@ -453,6 +453,9 @@ function render() {
 
   filtered.forEach(task => {
     const card = document.createElement("article");
+    const member = state.members.find(m => m.initials === task.assignee);
+    const assigneeName = member && member.name ? member.name : task.assignee;
+    const assigneeRole = member && member.role ? member.role : "";
 
     card.className = "issue-card";
     card.draggable = true;
@@ -488,8 +491,12 @@ function render() {
           ${escapeHtml(task.priority)}
         </span>
 
-        <span class="assignee" title="${escapeHtml(task.assignee)}">
-          ${escapeHtml(task.assignee)}
+        <span class="assignee-chip" title="${escapeHtml(assigneeName)} · ${escapeHtml(assigneeRole || "No role")}">
+          <span class="assignee">${escapeHtml(task.assignee)}</span>
+          <span class="assignee-meta">
+            <span class="assignee-name">${escapeHtml(assigneeName)}</span>
+            ${assigneeRole ? `<span class="assignee-role">${escapeHtml(assigneeRole)}</span>` : ""}
+          </span>
         </span>
       </div>
 
