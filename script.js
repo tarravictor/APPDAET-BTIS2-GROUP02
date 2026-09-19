@@ -270,10 +270,12 @@ async function loadMembers() {
 
     renderTeamSidebar();
     subscribeMembers();
+    render();
   } catch (error) {
     console.warn("Team roles unavailable:", error);
     state.members = defaultMembers.map(m => ({ ...m }));
     renderTeamSidebar();
+    render();
   }
 }
 
@@ -371,6 +373,7 @@ function saveTeamRoles() {
 
   if (changed) {
     renderTeamSidebar();
+    render();
     toast(
       supabaseClient
         ? "Roles saved — everyone sees the same roster."
