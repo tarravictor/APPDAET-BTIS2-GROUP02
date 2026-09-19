@@ -30,12 +30,21 @@ create trigger tasks_set_updated_at
 
 alter table public.tasks enable row level security;
 
+drop policy if exists "allow all access" on public.tasks;
 create policy "allow all access" on public.tasks
   for all
   using (true)
   with check (true);
 
-alter publication supabase_realtime add table public.tasks;
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'tasks'
+  ) then
+    alter publication supabase_realtime add table public.tasks;
+  end if;
+end $$;
 
 create table if not exists public.team_members (
   id uuid primary key default gen_random_uuid(),
@@ -47,12 +56,21 @@ create table if not exists public.team_members (
 
 alter table public.team_members enable row level security;
 
+drop policy if exists "allow all access team members" on public.team_members;
 create policy "allow all access team members" on public.team_members
   for all
   using (true)
   with check (true);
 
-alter publication supabase_realtime add table public.team_members;
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'team_members'
+  ) then
+    alter publication supabase_realtime add table public.team_members;
+  end if;
+end $$;
 
 insert into public.team_members (initials, name, role) values
   ('VT', 'Victor', 'Project Manager'),

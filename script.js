@@ -151,6 +151,42 @@ function saveLocalTasks() {
   localStorage.setItem("appdaetTasks", JSON.stringify(state.tasks));
 }
 
+function loadLocalMembers() {
+  try {
+    const raw = localStorage.getItem("appdaetTeamMembers");
+    if (raw) return JSON.parse(raw);
+  } catch (error) {
+    console.warn("Could not read local team members:", error);
+  }
+  return null;
+}
+
+function saveLocalMembers() {
+  try {
+    localStorage.setItem("appdaetTeamMembers", JSON.stringify(state.members));
+  } catch (error) {
+    console.warn("Could not save local team members:", error);
+  }
+}
+
+function membersFromRows(rows) {
+  return (rows || []).map(row => ({
+    id: row.id,
+    initials: row.initials,
+    name: row.name,
+    role: row.role
+  }));
+}
+
+function ensureKnownMembers(members) {
+  const combined = (members || []).slice();
+  const known = new Set(combined.map(m => m.initials));
+  defaultMembers.forEach(dm => {
+    if (!known.has(dm.initials)) combined.push({ ...dm });
+  });
+  return combined;
+}
+
 function toViewModel(row) {
   const id = row.id;
   return {
@@ -220,7 +256,7 @@ function saveTasks() {
 
 async function loadMembers() {
   if (!supabaseClient) {
-    state.members = defaultMembers.map(m => ({ ...m }));
+    state.members = ensureKnownMembers(loadLocalMembers() || []);
     renderTeamSidebar();
     return;
   }
@@ -233,49 +269,41 @@ async function loadMembers() {
 
     if (error) throw error;
 
-    const present = new Set((data || []).map(m => m.initials));
-    const missing = defaultMembers.filter(m => !present.has(m.initials));
-
     if (!data || data.length === 0) {
       const { error: seedError } = await supabaseClient
         .from("team_members")
         .upsert(defaultMembers, { onConflict: "initials" });
       if (seedError) throw seedError;
-      state.members = defaultMembers.map(m => ({ ...m }));
     } else {
+      const present = new Set(data.map(m => m.initials));
+      const missing = defaultMembers.filter(m => !present.has(m.initials));
       if (missing.length > 0) {
         const { error: addError } = await supabaseClient
           .from("team_members")
           .upsert(missing, { onConflict: "initials", ignoreDuplicates: true });
         if (addError) throw addError;
-        const { data: fresh, error: freshError } = await supabaseClient
-          .from("team_members")
-          .select("*")
-          .order("created_at");
-        if (freshError) throw freshError;
-        data = fresh;
       }
-      state.members = (data || []).map(row => ({
-        id: row.id,
-        initials: row.initials,
-        name: row.name,
-        role: row.role
-      }));
     }
 
-    const known = new Set(state.members.map(m => m.initials));
-    defaultMembers.forEach(dm => {
-      if (!known.has(dm.initials)) state.members.push({ ...dm });
-    });
+    const { data: fresh, error: freshError } = await supabaseClient
+      .from("team_members")
+      .select("*")
+      .order("created_at");
+    if (freshError) throw freshError;
 
+    state.members = ensureKnownMembers(membersFromRows(fresh));
+    saveLocalMembers();
     renderTeamSidebar();
     subscribeMembers();
     render();
   } catch (error) {
     console.warn("Team roles unavailable:", error);
-    state.members = defaultMembers.map(m => ({ ...m }));
+    state.members = ensureKnownMembers(loadLocalMembers() || []);
     renderTeamSidebar();
     render();
+    if (error && /team_members|schema cache/i.test(error.message || "")) {
+      toast("Roles aren't set up in Supabase yet — create the team_members table in the SQL Editor, then reload.");
+    }
   }
 }
 
@@ -338,8 +366,8 @@ function closeTeam() {
   teamModal.classList.add("hidden");
 }
 
-function saveTeamRoles() {
-  let changed = false;
+async function saveTeamRoles() {
+  const membersToSave = [];
 
   document.querySelectorAll(".team-role-input").forEach(input => {
     const member = state.members.find(m => m.initials === input.dataset.initials);
@@ -348,41 +376,53 @@ function saveTeamRoles() {
     const role = input.value.trim();
     if (role === (member.role || "")) return;
 
-    changed = true;
     member.role = role;
-
-    if (!supabaseClient) return;
-
-    if (member.id) {
-      supabaseClient
-        .from("team_members")
-        .update({ role })
-        .eq("id", member.id)
-        .then(({ error }) => {
-          if (error) console.warn("Could not update role:", error);
-        });
-    } else {
-      supabaseClient
-        .from("team_members")
-        .upsert({ initials: member.initials, name: member.name, role }, { onConflict: "initials" })
-        .then(({ error }) => {
-          if (error) console.warn("Could not save role:", error);
-        });
-    }
+    membersToSave.push(member);
   });
 
-  if (changed) {
-    renderTeamSidebar();
-    render();
-    toast(
-      supabaseClient
-        ? "Roles saved — everyone sees the same roster."
-        : "Demo mode — no database connected, roles won't be saved."
-    );
-    closeTeam();
-  } else {
+  if (membersToSave.length === 0) {
     toast("No changes to save.");
+    return;
   }
+
+  saveLocalMembers();
+  renderTeamSidebar();
+  render();
+
+  if (!supabaseClient) {
+    toast("Demo mode — no database connected, roles saved only in this browser.");
+    closeTeam();
+    return;
+  }
+
+  const writes = membersToSave.map(member => {
+    if (member.id) {
+      return supabaseClient
+        .from("team_members")
+        .update({ role: member.role })
+        .eq("id", member.id);
+    }
+    return supabaseClient
+      .from("team_members")
+      .upsert({ initials: member.initials, name: member.name, role: member.role }, { onConflict: "initials" });
+  });
+
+  try {
+    const results = await Promise.all(writes);
+    const failed = results.find(r => r.error);
+    if (failed) throw failed.error;
+    toast("Roles saved — everyone sees the same roster.");
+  } catch (error) {
+    console.warn("Could not save roles:", error);
+    const tableMissing = /team_members|schema cache/i.test(error.message || "");
+    toast(
+      tableMissing
+        ? "Saved only in this browser — create the team_members table: run supabase-schema.sql in the Supabase SQL Editor."
+        : `Could not save roles to the database: ${error.message}`
+    );
+  }
+
+  closeTeam();
 }
 
 function priorityIcon(priority) {
