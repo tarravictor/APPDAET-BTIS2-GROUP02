@@ -535,6 +535,14 @@ button {
   line-height: 1.45;
 }
 
+.issue-edited {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--border);
+  color: var(--muted);
+  font-size: 11px;
+}
+
 .issue-footer {
   display: flex;
   align-items: center;

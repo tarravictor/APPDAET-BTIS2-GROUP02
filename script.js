@@ -160,7 +160,8 @@ function toViewModel(row) {
     type: row.type || "Task",
     priority: row.priority || "Medium",
     status: row.status || "todo",
-    assignee: row.assignee || "VT"
+    assignee: row.assignee || "VT",
+    updatedAt: row.updated_at || row.created_at || null
   };
 }
 
@@ -381,6 +382,34 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#39;");
 }
 
+function formatSgTime(value) {
+  const date = new Date(value);
+  if (!value || isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("en-SG", {
+    timeZone: "Asia/Singapore",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
+  }).format(date);
+}
+
+function timeAgo(value) {
+  const date = new Date(value);
+  if (!value || isNaN(date.getTime())) return "";
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 45) return "just now";
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return formatSgTime(value);
+}
+
 function render() {
   Object.values(lists).forEach(list => {
     list.innerHTML = "";
@@ -440,6 +469,12 @@ function render() {
         </span>
       </div>
 
+      ${task.updatedAt ? `
+        <div class="issue-edited" title="${escapeHtml(formatSgTime(task.updatedAt))}">
+          Edited ${escapeHtml(timeAgo(task.updatedAt))}
+        </div>
+      ` : ""}
+
       <select class="card-status-move" aria-label="Move to status">
         <option value="todo"${task.status === "todo" ? " selected" : ""}>To Do</option>
         <option value="progress"${task.status === "progress" ? " selected" : ""}>In Progress</option>
@@ -496,6 +531,7 @@ function moveTask(task, newStatus) {
 
   const previousStatus = task.status;
   task.status = newStatus;
+  task.updatedAt = new Date().toISOString();
   render();
 
   if (state.liveMode && supabaseClient) {
@@ -603,7 +639,12 @@ form.addEventListener("submit", event => {
     const nextId = state.tasks.length
       ? Math.max(...state.tasks.map(task => task.id)) + 1
       : 1;
-    state.tasks.push({ id: nextId, key: `APP-${nextId}`, ...newTask });
+    state.tasks.push({
+      id: nextId,
+      key: `APP-${nextId}`,
+      updatedAt: new Date().toISOString(),
+      ...newTask
+    });
     saveTasks();
     closeModal();
     render();
@@ -750,14 +791,6 @@ docsOpen.addEventListener("click", () => {
   if (currentDocUrl) window.open(currentDocUrl, "_blank", "noopener");
 });
 
-document.getElementById("docsDrive").addEventListener("click", () => {
-  window.open(
-    "https://drive.google.com/drive/folders/1sD0Atg6OMmPXkFoir0URL8BafrjOYwf1?usp=sharing",
-    "_blank",
-    "noopener"
-  );
-});
-
 function renderDocsTabs() {
   docsTabs.innerHTML = "";
   repoDocs.forEach((doc, index) => {
@@ -786,6 +819,14 @@ function closeDocs() {
 }
 
 document.getElementById("docsNavItem").addEventListener("click", openDocs);
+document.getElementById("driveNavItem").addEventListener("click", () => {
+  window.open(
+    "https://drive.google.com/drive/folders/1sD0Atg6OMmPXkFoir0URL8BafrjOYwf1?usp=sharing",
+    "_blank",
+    "noopener"
+  );
+  sidebar.classList.remove("open");
+});
 document.getElementById("teamNavItem").addEventListener("click", openTeam);
 document.getElementById("teamRolesButton").addEventListener("click", openTeam);
 document.getElementById("closeTeam").addEventListener("click", closeTeam);
