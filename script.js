@@ -699,6 +699,11 @@ const repoDocs = [
   { label: "Coding Challenge 4", file: "Coding Challenge 4.pdf" }
 ];
 
+function repoFileUrl(name) {
+  const base = window.location.pathname.replace(/[^/]*$/, "");
+  return base + encodeURI(name);
+}
+
 const customDocUrl = docsEmbedUrl(CONFIG_DOCS_URL);
 if (customDocUrl && !CONFIG_DOCS_URL.includes("YOUR_DOC_ID")) {
   repoDocs.push({ label: "Google Doc", file: customDocUrl });
@@ -707,7 +712,7 @@ if (customDocUrl && !CONFIG_DOCS_URL.includes("YOUR_DOC_ID")) {
 function loadDoc(file, index) {
   docsFrame.classList.remove("hidden");
   docsPlaceholder.classList.add("hidden");
-  docsFrame.src = encodeURI(file);
+  docsFrame.src = file.startsWith("http") ? file : repoFileUrl(file);
   document.querySelectorAll(".docs-tab").forEach((tab, i) => {
     tab.classList.toggle("active", i === index);
   });
