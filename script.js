@@ -493,10 +493,7 @@ function render() {
 
         <span class="assignee-chip" title="${escapeHtml(assigneeName)} · ${escapeHtml(assigneeRole || "No role")}">
           <span class="assignee">${escapeHtml(task.assignee)}</span>
-          <span class="assignee-meta">
-            <span class="assignee-name">${escapeHtml(assigneeName)}</span>
-            ${assigneeRole ? `<span class="assignee-role">${escapeHtml(assigneeRole)}</span>` : ""}
-          </span>
+          ${assigneeRole ? `<span class="assignee-role">${escapeHtml(assigneeRole)}</span>` : ""}
         </span>
       </div>
 

@@ -584,28 +584,14 @@ button {
   min-width: 0;
 }
 
-.assignee-meta {
-  display: grid;
-  line-height: 1.2;
-  text-align: right;
-}
-
-.assignee-name {
-  font-size: 11px;
-  font-weight: 700;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  max-width: 120px;
-}
-
 .assignee-role {
   font-size: 10px;
+  font-weight: 600;
   color: var(--muted);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width: 120px;
+  max-width: 130px;
 }
 
 .add-card-button {
