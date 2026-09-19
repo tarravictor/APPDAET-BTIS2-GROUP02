@@ -447,7 +447,10 @@ function render() {
           ${escapeHtml(task.key)}
         </span>
 
-        <button class="card-delete" title="Delete issue" aria-label="Delete issue">✕</button>
+        <span class="card-actions">
+          <button class="card-edit" title="Edit issue" aria-label="Edit issue">✎</button>
+          <button class="card-delete" title="Delete issue" aria-label="Delete issue">✕</button>
+        </span>
       </div>
 
       <h4 class="issue-title">
@@ -495,6 +498,12 @@ function render() {
       event.preventDefault();
       event.stopPropagation();
       deleteTask(task);
+    });
+
+    card.querySelector(".card-edit").addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openEditModal(task);
     });
 
     card.querySelector(".card-status-move").addEventListener("change", (event) => {
@@ -577,9 +586,42 @@ document.querySelectorAll(".column").forEach(column => {
   });
 });
 
+let editingTaskId = null;
+const modalEyebrow = document.getElementById("modalEyebrow");
+const modalTitle = document.getElementById("modalTitle");
+const modalSubmit = document.getElementById("modalSubmit");
+const modalEditedAt = document.getElementById("modalEditedAt");
+
 function openModal(status = "todo") {
+  editingTaskId = null;
+  modalEyebrow.textContent = "New Issue";
+  modalTitle.textContent = "Create task";
+  modalSubmit.textContent = "Create issue";
+  modalEditedAt.classList.add("hidden");
   modal.classList.remove("hidden");
   document.getElementById("taskStatus").value = status;
+  document.getElementById("taskTitle").focus();
+}
+
+function openEditModal(task) {
+  editingTaskId = task.id;
+  modalEyebrow.textContent = "Edit Issue";
+  modalTitle.textContent = "Edit task";
+  modalSubmit.textContent = "Save changes";
+  modal.classList.remove("hidden");
+
+  document.getElementById("taskTitle").value = task.title || "";
+  document.getElementById("taskDescription").value = task.description || "";
+  document.getElementById("taskType").value = task.type || "Task";
+  document.getElementById("taskPriority").value = task.priority || "Medium";
+  document.getElementById("taskStatus").value = task.status || "todo";
+  document.getElementById("taskAssignee").value = task.assignee || "VT";
+
+  if (task.updatedAt) {
+    modalEditedAt.textContent = `Last modified: ${formatSgTime(task.updatedAt)}`;
+    modalEditedAt.classList.remove("hidden");
+  }
+
   document.getElementById("taskTitle").focus();
 }
 
@@ -621,6 +663,36 @@ form.addEventListener("submit", event => {
     status: document.getElementById("taskStatus").value,
     assignee: document.getElementById("taskAssignee").value
   };
+
+  if (editingTaskId) {
+    const task = state.tasks.find(t => String(t.id) === String(editingTaskId));
+    if (task) {
+      Object.assign(task, newTask);
+      task.updatedAt = new Date().toISOString();
+
+      if (state.liveMode && supabaseClient) {
+        supabaseClient
+          .from("tasks")
+          .update(newTask)
+          .eq("id", task.id)
+          .then(({ error }) => {
+            if (error) {
+              console.warn("Could not update task:", error);
+              toast("Could not save changes. Check your connection.");
+            } else {
+              toast("Issue updated.");
+            }
+          });
+      } else {
+        saveTasks();
+        toast("Issue updated.");
+      }
+
+      render();
+    }
+    closeModal();
+    return;
+  }
 
   if (state.liveMode && supabaseClient) {
     supabaseClient

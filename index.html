@@ -189,8 +189,8 @@
     <div class="modal">
       <div class="modal-header">
         <div>
-          <span class="eyebrow">New Issue</span>
-          <h3>Create task</h3>
+          <span class="eyebrow" id="modalEyebrow">New Issue</span>
+          <h3 id="modalTitle">Create task</h3>
         </div>
         <button class="modal-close" id="closeModal">×</button>
       </div>
@@ -248,9 +248,11 @@
           <textarea id="taskDescription" rows="4" placeholder="Add a short description"></textarea>
         </label>
 
+        <p class="modal-note hidden" id="modalEditedAt"></p>
+
         <div class="modal-actions">
           <button type="button" class="secondary-button" id="cancelModal">Cancel</button>
-          <button type="submit" class="primary-button">Create issue</button>
+          <button type="submit" class="primary-button" id="modalSubmit">Create issue</button>
         </div>
       </form>
     </div>

@@ -683,24 +683,33 @@ button {
   outline-offset: -3px;
 }
 
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.card-edit,
 .card-delete {
   border: 0;
   background: transparent;
   color: var(--muted);
   font-size: 13px;
   line-height: 1;
-  padding: 2px 5px;
+  padding: 3px 6px;
   border-radius: 4px;
   visibility: hidden;
 }
 
-.issue-card:hover .card-delete {
-  visibility: visible;
-}
-
+.card-edit:hover,
 .card-delete:hover {
   background: var(--border);
   color: var(--text);
+}
+
+.issue-card:hover .card-edit,
+.issue-card:hover .card-delete {
+  visibility: visible;
 }
 
 .card-status-move {
@@ -719,6 +728,7 @@ button {
 }
 
 @media (hover: none) {
+  .card-edit,
   .card-delete {
     visibility: visible;
   }
