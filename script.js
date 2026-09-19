@@ -263,6 +263,11 @@ async function loadMembers() {
       }));
     }
 
+    const known = new Set(state.members.map(m => m.initials));
+    defaultMembers.forEach(dm => {
+      if (!known.has(dm.initials)) state.members.push({ ...dm });
+    });
+
     renderTeamSidebar();
     subscribeMembers();
   } catch (error) {
