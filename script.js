@@ -750,6 +750,14 @@ docsOpen.addEventListener("click", () => {
   if (currentDocUrl) window.open(currentDocUrl, "_blank", "noopener");
 });
 
+document.getElementById("docsDrive").addEventListener("click", () => {
+  window.open(
+    "https://drive.google.com/drive/folders/1sD0Atg6OMmPXkFoir0URL8BafrjOYwf1?usp=sharing",
+    "_blank",
+    "noopener"
+  );
+});
+
 function renderDocsTabs() {
   docsTabs.innerHTML = "";
   repoDocs.forEach((doc, index) => {
