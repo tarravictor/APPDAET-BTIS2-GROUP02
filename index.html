@@ -21,25 +21,13 @@
       </div>
 
       <nav class="nav">
-        <button class="nav-item active">
+        <button class="nav-item active" id="boardNavItem">
           <span class="nav-icon">▦</span>
           Board
         </button>
-        <button class="nav-item">
-          <span class="nav-icon">☰</span>
-          Backlog
-        </button>
-        <button class="nav-item">
-          <span class="nav-icon">⌁</span>
-          Timeline
-        </button>
-        <button class="nav-item">
-          <span class="nav-icon">✓</span>
-          Issues
-        </button>
-        <button class="nav-item">
-          <span class="nav-icon">⚙</span>
-          Project Settings
+        <button class="nav-item" id="docsNavItem">
+          <span class="nav-icon">❐</span>
+          Docs
         </button>
       </nav>
 
@@ -49,8 +37,9 @@
         <p>PROJECT TEAM</p>
         <div class="avatar-row">
           <div class="avatar avatar-a">VT</div>
-          <div class="avatar avatar-b">MY</div>
-          <div class="avatar avatar-c">M3</div>
+          <div class="avatar avatar-b">EM</div>
+          <div class="avatar avatar-c">EJ</div>
+          <div class="avatar avatar-d">RN</div>
         </div>
       </div>
     </aside>
@@ -67,8 +56,7 @@
 
         <div class="topbar-actions">
           <button class="icon-button" id="themeButton" title="Toggle theme">☾</button>
-          <button class="primary-button" id="createTaskButton">+ Create</button>
-          <div class="profile-avatar">VT</div>
+          <div class="profile-avatar">A2</div>
         </div>
       </header>
 
@@ -80,8 +68,7 @@
             <p>Kanban board for tracking tasks, features, bugs, and project progress.</p>
           </div>
           <div class="heading-actions">
-            <button class="secondary-button">Share</button>
-            <button class="secondary-button">•••</button>
+            <button class="primary-button" id="createTaskButton">+ Create</button>
           </div>
         </div>
 
@@ -98,8 +85,9 @@
 
           <div class="member-filter">
             <div class="mini-avatar">VT</div>
-            <div class="mini-avatar">MY</div>
-            <div class="mini-avatar">M3</div>
+            <div class="mini-avatar">EM</div>
+            <div class="mini-avatar">EJ</div>
+            <div class="mini-avatar">RN</div>
           </div>
 
           <select id="priorityFilter" class="filter-select">
@@ -239,8 +227,9 @@
             Assignee
             <select id="taskAssignee">
               <option value="VT">Victor</option>
-              <option value="MY">Maryloe</option>
-              <option value="M3">Member 3</option>
+              <option value="EM">Ethan M</option>
+              <option value="EJ">Ethan J</option>
+              <option value="RN">Rain</option>
             </select>
           </label>
         </div>
@@ -255,6 +244,25 @@
           <button type="submit" class="primary-button">Create issue</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="docsModal">
+    <div class="docs-window">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">Shared Resource</span>
+          <h3>Project Document</h3>
+        </div>
+        <button class="modal-close" id="closeDocs">×</button>
+      </div>
+      <div class="docs-body">
+        <div class="docs-placeholder hidden" id="docsPlaceholder">
+          <p>No Google Docs link configured yet.</p>
+          <p>Open <code>config.js</code> and set <code>GOOGLE_DOCS_URL</code> to your shared document link.</p>
+        </div>
+        <iframe id="docsFrame" class="docs-frame" title="Project document" allowfullscreen></iframe>
+      </div>
     </div>
   </div>
 

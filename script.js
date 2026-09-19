@@ -17,7 +17,7 @@ const defaultTasks = [
     type: "Task",
     priority: "Medium",
     status: "progress",
-    assignee: "MY"
+    assignee: "EM"
   },
   {
     id: 3,
@@ -27,7 +27,7 @@ const defaultTasks = [
     type: "Task",
     priority: "High",
     status: "progress",
-    assignee: "M3"
+    assignee: "EJ"
   },
   {
     id: 4,
@@ -37,7 +37,7 @@ const defaultTasks = [
     type: "Bug",
     priority: "High",
     status: "review",
-    assignee: "MY"
+    assignee: "RN"
   },
   {
     id: 5,
@@ -47,7 +47,7 @@ const defaultTasks = [
     type: "Task",
     priority: "Low",
     status: "todo",
-    assignee: "M3"
+    assignee: "RN"
   },
   {
     id: 6,
@@ -67,7 +67,7 @@ const defaultTasks = [
     type: "Story",
     priority: "Low",
     status: "done",
-    assignee: "MY"
+    assignee: "EM"
   }
 ];
 
@@ -506,5 +506,46 @@ if (localStorage.getItem("appdaetTheme") === "dark") {
 if (!supabaseClient) {
   showSetupBanner();
 }
+
+const docsModal = document.getElementById("docsModal");
+const docsFrame = document.getElementById("docsFrame");
+const docsPlaceholder = document.getElementById("docsPlaceholder");
+
+const CONFIG_DOCS_URL = typeof GOOGLE_DOCS_URL === "string" ? GOOGLE_DOCS_URL : "";
+
+function docsEmbedUrl(url) {
+  if (!url) return null;
+  const match = url.match(/\/document\/d\/([^/]+)/);
+  if (match) return `https://docs.google.com/document/d/${match[1]}/preview`;
+  return url;
+}
+
+function openDocs() {
+  docsModal.classList.remove("hidden");
+  const embedUrl = docsEmbedUrl(CONFIG_DOCS_URL);
+  if (embedUrl) {
+    docsFrame.src = embedUrl;
+    docsFrame.classList.remove("hidden");
+    docsPlaceholder.classList.add("hidden");
+  } else {
+    docsFrame.classList.add("hidden");
+    docsPlaceholder.classList.remove("hidden");
+  }
+}
+
+function closeDocs() {
+  docsModal.classList.add("hidden");
+  docsFrame.src = "about:blank";
+}
+
+document.getElementById("docsNavItem").addEventListener("click", openDocs);
+document.getElementById("boardNavItem").addEventListener("click", () => {
+  closeDocs();
+  sidebar.classList.remove("open");
+});
+document.getElementById("closeDocs").addEventListener("click", closeDocs);
+docsModal.addEventListener("click", event => {
+  if (event.target === docsModal) closeDocs();
+});
 
 loadTasks();
