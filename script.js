@@ -71,6 +71,13 @@ const defaultTasks = [
   }
 ];
 
+const defaultMembers = [
+  { initials: "VT", name: "Victor", role: "Project Manager" },
+  { initials: "EM", name: "Ethan M", role: "Developer" },
+  { initials: "EJ", name: "Ethan J", role: "Designer" },
+  { initials: "RN", name: "Rain", role: "QA / Reviewer" }
+];
+
 const CONFIG_URL = typeof SUPABASE_URL === "string" ? SUPABASE_URL : "";
 const CONFIG_ANON_KEY = typeof SUPABASE_ANON_KEY === "string" ? SUPABASE_ANON_KEY : "";
 
@@ -92,7 +99,10 @@ const state = {
   search: "",
   priority: "all",
   liveMode: Boolean(supabaseClient),
-  subscribed: false
+  subscribed: false,
+  members: [],
+  membersLive: Boolean(supabaseClient),
+  membersSubscribed: false
 };
 
 const lists = {
@@ -205,6 +215,167 @@ function subscribe() {
 
 function saveTasks() {
   saveLocalTasks();
+}
+
+function loadLocalMembers() {
+  try {
+    const raw = localStorage.getItem("appdaetMembers");
+    if (raw) return JSON.parse(raw);
+  } catch (error) {
+    console.warn("Could not read local members:", error);
+  }
+  return defaultMembers;
+}
+
+function saveLocalMembers() {
+  localStorage.setItem("appdaetMembers", JSON.stringify(state.members));
+}
+
+async function loadMembers() {
+  if (!supabaseClient) {
+    state.membersLive = false;
+    state.members = loadLocalMembers();
+    renderTeamSidebar();
+    return;
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("team_members")
+      .select("*")
+      .order("created_at");
+
+    if (error) throw error;
+
+    state.membersLive = true;
+
+    if (!data || data.length === 0) {
+      const { error: seedError } = await supabaseClient
+        .from("team_members")
+        .upsert(defaultMembers, { onConflict: "initials" });
+      if (seedError) throw seedError;
+      state.members = defaultMembers.map(m => ({ ...m }));
+    } else {
+      state.members = data.map(row => ({
+        id: row.id,
+        initials: row.initials,
+        name: row.name,
+        role: row.role
+      }));
+    }
+
+    renderTeamSidebar();
+    subscribeMembers();
+  } catch (error) {
+    console.warn("Team roles unavailable, using local roster:", error);
+    state.membersLive = false;
+    state.members = loadLocalMembers();
+    renderTeamSidebar();
+  }
+}
+
+function subscribeMembers() {
+  if (!supabaseClient || state.membersSubscribed) return;
+  state.membersSubscribed = true;
+  supabaseClient
+    .channel("team-members")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "team_members" },
+      () => loadMembers()
+    )
+    .subscribe();
+}
+
+function avatarColor(initials) {
+  const map = { VT: "avatar-a", EM: "avatar-b", EJ: "avatar-c", RN: "avatar-d" };
+  return map[initials] || "avatar-d";
+}
+
+function renderTeamSidebar() {
+  const box = document.getElementById("teamAvatars");
+  if (!box) return;
+  box.innerHTML = "";
+  state.members.forEach(member => {
+    const el = document.createElement("div");
+    el.className = `avatar ${avatarColor(member.initials)}`;
+    el.textContent = member.initials;
+    el.title = `${member.name} — ${member.role || "No role set"}`;
+    box.appendChild(el);
+  });
+}
+
+function renderTeamModal() {
+  const list = document.getElementById("teamList");
+  list.innerHTML = "";
+  state.members.forEach(member => {
+    const row = document.createElement("div");
+    row.className = "team-row";
+    row.innerHTML = `
+      <span class="avatar ${avatarColor(member.initials)}">${escapeHtml(member.initials)}</span>
+      <div class="team-info">
+        <strong>${escapeHtml(member.name)}</strong>
+        <span>${escapeHtml(member.initials)}</span>
+      </div>
+      <input class="team-role-input" data-initials="${escapeHtml(member.initials)}" value="${escapeHtml(member.role)}" maxlength="60" placeholder="Role (e.g. Developer)" />
+    `;
+    list.appendChild(row);
+  });
+}
+
+function openTeam() {
+  renderTeamModal();
+  teamModal.classList.remove("hidden");
+}
+
+function closeTeam() {
+  teamModal.classList.add("hidden");
+}
+
+function saveTeamRoles() {
+  let changed = false;
+
+  document.querySelectorAll(".team-role-input").forEach(input => {
+    const member = state.members.find(m => m.initials === input.dataset.initials);
+    if (!member) return;
+
+    const role = input.value.trim();
+    if (role === (member.role || "")) return;
+
+    changed = true;
+    member.role = role;
+
+    if (state.membersLive && supabaseClient) {
+      if (member.id) {
+        supabaseClient
+          .from("team_members")
+          .update({ role })
+          .eq("id", member.id)
+          .then(({ error }) => {
+            if (error) console.warn("Could not update role:", error);
+          });
+      } else {
+        supabaseClient
+          .from("team_members")
+          .upsert({ initials: member.initials, name: member.name, role }, { onConflict: "initials" })
+          .then(({ error }) => {
+            if (error) console.warn("Could not save role:", error);
+          });
+      }
+    }
+  });
+
+  if (changed) {
+    if (!(state.membersLive && supabaseClient)) saveLocalMembers();
+    renderTeamSidebar();
+    toast(
+      state.membersLive
+        ? "Roles saved — everyone can see them."
+        : "Roles saved on this browser only."
+    );
+  } else {
+    toast("No changes to save.");
+  }
 }
 
 function priorityIcon(priority) {
@@ -511,6 +682,8 @@ const docsModal = document.getElementById("docsModal");
 const docsFrame = document.getElementById("docsFrame");
 const docsPlaceholder = document.getElementById("docsPlaceholder");
 
+const teamModal = document.getElementById("teamModal");
+
 const CONFIG_DOCS_URL = typeof GOOGLE_DOCS_URL === "string" ? GOOGLE_DOCS_URL : "";
 
 function docsEmbedUrl(url) {
@@ -539,8 +712,17 @@ function closeDocs() {
 }
 
 document.getElementById("docsNavItem").addEventListener("click", openDocs);
+document.getElementById("teamNavItem").addEventListener("click", openTeam);
+document.getElementById("teamRolesButton").addEventListener("click", openTeam);
+document.getElementById("closeTeam").addEventListener("click", closeTeam);
+document.getElementById("cancelTeam").addEventListener("click", closeTeam);
+document.getElementById("saveTeamRoles").addEventListener("click", saveTeamRoles);
+teamModal.addEventListener("click", event => {
+  if (event.target === teamModal) closeTeam();
+});
 document.getElementById("boardNavItem").addEventListener("click", () => {
   closeDocs();
+  closeTeam();
   sidebar.classList.remove("open");
 });
 document.getElementById("closeDocs").addEventListener("click", closeDocs);
@@ -549,3 +731,4 @@ docsModal.addEventListener("click", event => {
 });
 
 loadTasks();
+loadMembers();

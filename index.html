@@ -25,6 +25,10 @@
           <span class="nav-icon">▦</span>
           Board
         </button>
+        <button class="nav-item" id="teamNavItem">
+          <span class="nav-icon">☷</span>
+          Team
+        </button>
         <button class="nav-item" id="docsNavItem">
           <span class="nav-icon">❐</span>
           Docs
@@ -35,12 +39,13 @@
 
       <div class="team-box">
         <p>PROJECT TEAM</p>
-        <div class="avatar-row">
+        <div class="avatar-row" id="teamAvatars">
           <div class="avatar avatar-a">VT</div>
           <div class="avatar avatar-b">EM</div>
           <div class="avatar avatar-c">EJ</div>
           <div class="avatar avatar-d">RN</div>
         </div>
+        <button class="team-roles-button" id="teamRolesButton">✎ Edit roles</button>
       </div>
     </aside>
 
@@ -244,6 +249,27 @@
           <button type="submit" class="primary-button">Create issue</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="teamModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow">Project Team</span>
+          <h3>Team roles</h3>
+        </div>
+        <button class="modal-close" id="closeTeam">×</button>
+      </div>
+
+      <p class="modal-note">Each member edits their own role here. Changes are saved to the shared board so everyone sees the same roles.</p>
+
+      <div class="team-list" id="teamList"></div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-button" id="cancelTeam">Close</button>
+        <button type="button" class="primary-button" id="saveTeamRoles">Save changes</button>
+      </div>
     </div>
   </div>
 

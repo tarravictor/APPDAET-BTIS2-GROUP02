@@ -17,3 +17,27 @@ create policy "allow all access" on public.tasks
   with check (true);
 
 alter publication supabase_realtime add table public.tasks;
+
+create table if not exists public.team_members (
+  id uuid primary key default gen_random_uuid(),
+  initials text unique not null,
+  name text not null,
+  role text not null default '',
+  created_at timestamptz not null default now()
+);
+
+alter table public.team_members enable row level security;
+
+create policy "allow all access team members" on public.team_members
+  for all
+  using (true)
+  with check (true);
+
+alter publication supabase_realtime add table public.team_members;
+
+insert into public.team_members (initials, name, role) values
+  ('VT', 'Victor', 'Project Manager'),
+  ('EM', 'Ethan M', 'Developer'),
+  ('EJ', 'Ethan J', 'Designer'),
+  ('RN', 'Rain', 'QA / Reviewer')
+on conflict (initials) do nothing;

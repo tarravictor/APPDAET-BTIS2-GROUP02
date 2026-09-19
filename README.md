@@ -17,7 +17,7 @@ Supabase (online database)  ◀── all members' laptops read/write here
 ## Setup: Supabase (one time, by anyone in the team)
 
 1. Create a free project at https://supabase.com
-2. In the project, open **SQL Editor** → New query, paste the contents of `supabase-schema.sql`, and run it. This creates the `tasks` table, enables row-level security with an open access policy, and turns on Realtime.
+2. In the project, open **SQL Editor** → New query, paste the contents of `supabase-schema.sql`, and run it. This creates the `tasks` and `team_members` tables, enables row-level security with an open access policy, and turns on Realtime.
 3. Go to **Project Settings → API**. Copy the **Project URL** and the **anon / public key**.
 4. Open `config.js` and replace the placeholder values:
 
@@ -56,6 +56,7 @@ git push -u origin main
 - **Filter** — search by text or filter by priority; "Clear filters" resets.
 - **Delete** — hover a card and click the ✕ (asks for confirmation).
 - **Docs** — the "Docs" item in the sidebar opens an embedded Google Docs view (edit `GOOGLE_DOCS_URL` in `config.js` with your shared-document link).
+- **Team roles** — open **Team** in the sidebar (or "Edit roles") and set each member's role; it's saved to the shared board so everyone sees the same roster.
 - **Dark mode** — ☾ in the top bar (remembered on your device).
 
 ## File structure

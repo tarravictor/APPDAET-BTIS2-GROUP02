@@ -149,6 +149,24 @@ button {
   letter-spacing: .08em;
 }
 
+.team-roles-button {
+  margin-top: 14px;
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.12);
+  background: transparent;
+  color: #94a3b8;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: left;
+}
+
+.team-roles-button:hover {
+  background: var(--sidebar-soft);
+  color: #e5e7eb;
+}
+
 .avatar-row {
   display: flex;
 }
@@ -744,6 +762,60 @@ body.dark .setup-banner {
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 12px;
+}
+
+.modal-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0 0 14px;
+}
+
+.team-list {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.team-row .avatar {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-color: var(--panel-soft);
+}
+
+.team-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.team-info strong {
+  display: block;
+  font-size: 14px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.team-info span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.team-role-input {
+  width: 46%;
+  min-width: 170px;
+  max-width: 260px;
 }
 
 #toast {
