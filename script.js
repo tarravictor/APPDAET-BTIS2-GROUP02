@@ -973,12 +973,300 @@ teamModal.addEventListener("click", event => {
 document.getElementById("boardNavItem").addEventListener("click", () => {
   closeDocs();
   closeTeam();
+  closeLegal();
   sidebar.classList.remove("open");
 });
 document.getElementById("closeDocs").addEventListener("click", closeDocs);
 docsModal.addEventListener("click", event => {
   if (event.target === docsModal) closeDocs();
 });
+
+const legalModal = document.getElementById("legalModal");
+const legalEyebrow = document.getElementById("legalEyebrow");
+const legalTitle = document.getElementById("legalTitle");
+const legalBody = document.getElementById("legalBody");
+
+const privacyContent = `
+  <h4>Overview</h4>
+  <p>This website is the shared kanban board for the <strong>APPDAET-BTIS2-GROUP2</strong> academic project. This Privacy Policy explains what information the site handles, where it is stored, and the rights you have under Philippine law.</p>
+
+  <h4>Data Privacy Act of 2012 (Republic Act No. 10173)</h4>
+  <p>The project respects your privacy and observes the principles of the <strong>Data Privacy Act of 2012 (R.A. 10173)</strong> — transparency, legitimate purpose, and proportionality in the collection and processing of personal data. By using this website, you consent to the handling of data described below.</p>
+
+  <h4>What data this website collects</h4>
+  <ul>
+    <li><strong>Issues you create</strong> — title, description, type, priority, status, and assignee.</li>
+    <li><strong>Team information</strong> — member names, initials, and role labels.</li>
+    <li><strong>Browser settings</strong> — your chosen theme (light/dark) and a marker that you have seen the tutorial. These are stored only on your own browser.</li>
+  </ul>
+  <p>No sensitive personal data (such as ID numbers, addresses, or financial information) is requested by this site.</p>
+
+  <h4>How your data is used</h4>
+  <p>Data is used only to operate the shared board so every team member sees the same live project — issues, roles, and progress — and nothing else. It is never sold or shared for marketing.</p>
+
+  <h4>Where your data is stored</h4>
+  <ul>
+    <li><strong>Supabase</strong> — a cloud-hosted PostgreSQL database that stores issues and team roles when the database connection is active.</li>
+    <li><strong>Your browser's local storage</strong> — used in demo mode (when no database is connected) and for your theme and tutorial preferences.</li>
+  </ul>
+
+  <h4>Third-party services</h4>
+  <ul>
+    <li><strong>Supabase</strong> — online database and realtime sync for the board.</li>
+    <li><strong>Google Fonts</strong> — loads the Inter typeface used by the interface.</li>
+    <li><strong>GitHub Pages</strong> — hosts this website.</li>
+  </ul>
+  <p>Each of these services operates under its own privacy policy.</p>
+
+  <h4>Your rights under R.A. 10173</h4>
+  <p>You may request access to, correction of, or deletion of your personal data. Please contact the Project Manager (Victor / VT) and changes will be applied to the shared board. Removing or clearing a shared issue affects what other teammates see.</p>
+
+  <h4>Contact</h4>
+  <p>For any privacy concern, reach out to the <strong>APPDAET-BTIS2-GROUP2</strong> project team through the Project Manager.</p>`;
+
+const termsContent = `
+  <h4>Acceptance of Terms</h4>
+  <p>By accessing and using <strong>APPDAET-BTIS2-GROUP2</strong>, you agree to these Terms and Conditions. If you do not agree, please do not use the website.</p>
+
+  <h4>About the platform</h4>
+  <p>This is a kanban board used for tracking tasks, stories, bugs, and overall progress for the BTIS2 Group 2 academic project. It is provided as-is for the project's educational purposes.</p>
+
+  <h4>Technologies used</h4>
+  <p>This website is built with simple, open web technologies:</p>
+  <ul>
+    <li><strong>HTML</strong> — page structure and content.</li>
+    <li><strong>CSS</strong> — styling, layout, and light/dark themes.</li>
+    <li><strong>JavaScript</strong> — interactivity such as drag-and-drop, modals, filters, and the guided tour.</li>
+    <li><strong>Supabase</strong> — the online database (PostgreSQL) and realtime updates shared by the team.</li>
+    <li><strong>Google Fonts</strong> — the Inter typeface.</li>
+    <li><strong>GitHub Pages</strong> — hosting of the site.</li>
+  </ul>
+
+  <h4>Acceptable use</h4>
+  <ul>
+    <li>Use the board only for the group project's purposes.</li>
+    <li>Do not post harmful, illegal, defamatory, or misleading content.</li>
+    <li>Remember that the board is shared — changes you make are visible to all team members.</li>
+  </ul>
+
+  <h4>Demo mode</h4>
+  <p>If the online database is not connected, the site runs in <strong>demo mode</strong> and saves changes only in your browser. A banner will be shown at the top of the board when this is the case.</p>
+
+  <h4>Content and ownership</h4>
+  <p>The issues, roles, and documents on this board are contributed by the team for the project. Shared documents remain the property of their respective authors. This website and its interface are part of the group's academic output.</p>
+
+  <h4>Changes to these terms</h4>
+  <p>The team may update these Terms and Conditions from time to time. Continued use of the website after changes means you accept the updated terms.</p>
+
+  <h4>Contact</h4>
+  <p>Questions about these terms? Contact the <strong>APPDAET-BTIS2-GROUP2</strong> project team through the Project Manager (Victor / VT).</p>`;
+
+function openLegal(kind) {
+  const isPrivacy = kind === "privacy";
+  legalEyebrow.textContent = isPrivacy ? "Data Privacy" : "Legal";
+  legalTitle.textContent = isPrivacy ? "Privacy Policy" : "Terms and Conditions";
+  legalBody.innerHTML = isPrivacy ? privacyContent : termsContent;
+  legalModal.classList.remove("hidden");
+  sidebar.classList.remove("open");
+}
+
+function closeLegal() {
+  legalModal.classList.add("hidden");
+}
+
+document.getElementById("privacyNavItem").addEventListener("click", () => openLegal("privacy"));
+document.getElementById("termsNavItem").addEventListener("click", () => openLegal("terms"));
+document.getElementById("closeLegal").addEventListener("click", closeLegal);
+document.getElementById("cancelLegal").addEventListener("click", closeLegal);
+legalModal.addEventListener("click", event => {
+  if (event.target === legalModal) closeLegal();
+});
+
+const tourOverlay = document.getElementById("tourOverlay");
+const tourHighlight = document.getElementById("tourHighlight");
+const tourCard = document.getElementById("tourCard");
+const tourNumber = document.getElementById("tourNumber");
+const tourTitle = document.getElementById("tourTitle");
+const tourText = document.getElementById("tourText");
+const tourProgress = document.getElementById("tourProgress");
+const tourPrev = document.getElementById("tourPrev");
+const tourNext = document.getElementById("tourNext");
+const tourSkip = document.getElementById("tourSkip");
+const tourReplay = document.getElementById("tourReplay");
+
+const TOUR_KEY = "appdaetTourSeen";
+
+const tourSteps = [
+  {
+    target: null,
+    align: "center",
+    title: "Welcome to APPDAET",
+    text: "This is your team's shared kanban board. In a few quick steps we'll show you the essentials so you can jump right in."
+  },
+  {
+    target: "#createTaskButton",
+    align: "bottom",
+    title: "Create issues",
+    text: "Click + Create to add a task, story, or bug. Assign it to a teammate, pick a type, and set a priority."
+  },
+  {
+    target: "#board",
+    align: "top",
+    title: "The board",
+    text: "Issues flow through four columns: TO DO, IN PROGRESS, IN REVIEW, and DONE. Drag a card between columns to update its status."
+  },
+  {
+    target: ".board-toolbar",
+    align: "bottom",
+    title: "Search & filter",
+    text: "Use the search bar to find specific issues and filter by priority so you can focus on what matters most."
+  },
+  {
+    target: "#teamNavItem",
+    align: "right",
+    title: "Team",
+    text: "Open the Team page to view your teammates, adjust their avatars, and edit each member's role."
+  },
+  {
+    target: "#docsNavItem",
+    align: "right",
+    title: "Docs",
+    text: "The Docs section links to your project plan and shared documentation, all in one place."
+  },
+  {
+    target: "#themeButton",
+    align: "bottom",
+    title: "Dark mode",
+    text: "Toggle light and dark themes anytime with one click. That's everything — you're ready to go!"
+  }
+];
+
+let tourIndex = 0;
+
+function positionTourHighlight(el) {
+  if (el.closest("#sidebar") && window.innerWidth <= 1050 && !sidebar.classList.contains("open")) {
+    sidebar.classList.add("open");
+  }
+  const rect = el.getBoundingClientRect();
+  const pad = 6;
+  tourHighlight.style.left = `${rect.left - pad}px`;
+  tourHighlight.style.top = `${rect.top - pad}px`;
+  tourHighlight.style.width = `${rect.width + pad * 2}px`;
+  tourHighlight.style.height = `${rect.height + pad * 2}px`;
+  tourHighlight.style.opacity = "1";
+  return rect;
+}
+
+function positionTourCard(rect, edge) {
+  const cardW = tourCard.offsetWidth;
+  const cardH = tourCard.offsetHeight;
+  const gap = 16;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  let x;
+  let y;
+
+  if (edge === "bottom") {
+    x = rect.left + rect.width / 2 - cardW / 2;
+    y = rect.bottom + gap;
+  } else if (edge === "top") {
+    x = rect.left + rect.width / 2 - cardW / 2;
+    y = rect.top - cardH - gap;
+  } else if (edge === "right") {
+    x = rect.right + gap;
+    y = rect.top + rect.height / 2 - cardH / 2;
+  } else if (edge === "left") {
+    x = rect.left - cardW - gap;
+    y = rect.top + rect.height / 2 - cardH / 2;
+  } else {
+    x = (vw - cardW) / 2;
+    y = (vh - cardH) / 2;
+  }
+
+  x = Math.max(12, Math.min(x, vw - cardW - 12));
+  y = Math.max(12, Math.min(y, vh - cardH - 12));
+  tourCard.style.left = `${x}px`;
+  tourCard.style.top = `${y}px`;
+}
+
+function showTourStep(index) {
+  tourIndex = index;
+  const step = tourSteps[index];
+
+  tourTitle.textContent = step.title;
+  tourText.textContent = step.text;
+  tourNumber.textContent = `${index + 1} / ${tourSteps.length}`;
+  tourPrev.disabled = index === 0;
+  tourNext.textContent = index === tourSteps.length - 1 ? "Done" : "Next ›";
+
+  tourProgress.innerHTML = tourSteps
+    .map((_, i) => `<span class="tour-progress-dot${i === index ? " active" : ""}"></span>`)
+    .join("");
+
+  if (!step.target) {
+    tourHighlight.style.opacity = "0";
+    positionTourCard({ left: 0, top: 0 }, "center");
+    return;
+  }
+
+  const el = document.querySelector(step.target);
+  if (!el) {
+    tourHighlight.style.opacity = "0";
+    positionTourCard({ left: 0, top: 0 }, "center");
+    return;
+  }
+
+  el.scrollIntoView({ block: "center", inline: "center" });
+  requestAnimationFrame(() => {
+    const rect = positionTourHighlight(el);
+    positionTourCard(rect, step.align);
+  });
+}
+
+function openTour() {
+  if (!tourOverlay.classList.contains("hidden")) return;
+  document.body.classList.add("tour-open");
+  tourOverlay.classList.remove("hidden");
+  tourOverlay.classList.add("show");
+  showTourStep(0);
+}
+
+function closeTour() {
+  document.body.classList.remove("tour-open");
+  tourOverlay.classList.add("hidden");
+  tourOverlay.classList.remove("show");
+  sidebar.classList.remove("open");
+  localStorage.setItem(TOUR_KEY, "1");
+}
+
+tourNext.addEventListener("click", () => {
+  if (tourIndex === tourSteps.length - 1) {
+    closeTour();
+  } else {
+    showTourStep(tourIndex + 1);
+  }
+});
+
+tourPrev.addEventListener("click", () => {
+  if (tourIndex > 0) showTourStep(tourIndex - 1);
+});
+
+tourSkip.addEventListener("click", closeTour);
+tourReplay.addEventListener("click", openTour);
+
+window.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !tourOverlay.classList.contains("hidden")) {
+    closeTour();
+  }
+});
+
+window.addEventListener("resize", () => {
+  if (!tourOverlay.classList.contains("hidden")) showTourStep(tourIndex);
+});
+
+setTimeout(() => {
+  if (localStorage.getItem(TOUR_KEY) !== "1") openTour();
+}, 700);
 
 loadTasks();
 loadMembers();

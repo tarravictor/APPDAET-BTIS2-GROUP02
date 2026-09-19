@@ -38,6 +38,14 @@
           <span class="nav-icon">▤</span>
           Drive
         </a>
+        <button class="nav-item" id="privacyNavItem">
+          <span class="nav-icon">⚿</span>
+          Privacy
+        </button>
+        <button class="nav-item" id="termsNavItem">
+          <span class="nav-icon">☰</span>
+          Terms
+        </button>
       </nav>
 
       <div class="sidebar-spacer"></div>
@@ -66,6 +74,7 @@
         </div>
 
         <div class="topbar-actions">
+          <button class="icon-button" id="tourReplay" title="Show guided tour" aria-label="Show guided tour">?</button>
           <button class="icon-button" id="themeButton" title="Toggle theme">☾</button>
           <div class="profile-avatar">A2</div>
         </div>
@@ -309,6 +318,37 @@
         <div class="docs-viewer">
           <iframe id="docsFrame" class="docs-frame" title="Project document" allowfullscreen></iframe>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="legalModal">
+    <div class="legal-window">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow" id="legalEyebrow">Legal</span>
+          <h3 id="legalTitle">Terms & Conditions</h3>
+        </div>
+        <button class="modal-close" id="closeLegal">×</button>
+      </div>
+      <div class="legal-body" id="legalBody"></div>
+      <div class="modal-actions">
+        <button type="button" class="secondary-button" id="cancelLegal">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="tourOverlay" class="tour-overlay hidden">
+    <div class="tour-highlight" id="tourHighlight"></div>
+    <div class="tour-card" id="tourCard">
+      <button type="button" class="tour-skip" id="tourSkip" aria-label="Skip tour">Skip ✕</button>
+      <span class="tour-number" id="tourNumber"></span>
+      <h3 id="tourTitle"></h3>
+      <p id="tourText"></p>
+      <div class="tour-progress" id="tourProgress"></div>
+      <div class="tour-actions">
+        <button type="button" class="secondary-button" id="tourPrev">‹ Back</button>
+        <button type="button" class="primary-button" id="tourNext">Next ›</button>
       </div>
     </div>
   </div>

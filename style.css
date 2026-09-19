@@ -1000,6 +1000,75 @@ body.dark .setup-banner {
   max-width: 260px;
 }
 
+.legal-window {
+  width: min(720px, 100%);
+  max-height: min(88vh, 720px);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 22px 22px 0;
+}
+
+.legal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 6px 20px 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.legal-body h4 {
+  margin: 20px 0 6px;
+  font-size: 14px;
+  letter-spacing: .02em;
+}
+
+.legal-body h4:first-child {
+  margin-top: 0;
+}
+
+.legal-body p {
+  margin: 0 0 10px;
+  color: var(--muted);
+}
+
+.legal-body ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.legal-body li {
+  margin-bottom: 4px;
+}
+
+.legal-body strong {
+  color: var(--text);
+}
+
+.legal-window .modal-actions {
+  flex-shrink: 0;
+  padding-bottom: 4px;
+}
+
+@media (max-width: 720px) {
+  .legal-window {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+    border: 0;
+    padding: 16px 14px 0;
+  }
+}
+
 #toast {
   position: fixed;
   bottom: 20px;
@@ -1019,6 +1088,119 @@ body.dark .setup-banner {
 #toast.show {
   opacity: 1;
   transform: translate(-50%, 0);
+}
+
+body.tour-open {
+  overflow: hidden;
+}
+
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tour-overlay.show {
+  opacity: 1;
+  transition: opacity .2s ease;
+}
+
+.tour-highlight {
+  position: fixed;
+  border-radius: 10px;
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 0 9999px rgba(9, 30, 66, 0.55);
+  opacity: 0;
+  transition: all .25s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+body.dark .tour-highlight {
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.65);
+}
+
+.tour-card {
+  position: fixed;
+  width: min(340px, calc(100vw - 24px));
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.tour-skip {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tour-skip:hover {
+  color: var(--text);
+}
+
+.tour-number {
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.tour-card h3 {
+  margin: 6px 0 6px;
+  font-size: 18px;
+  padding-right: 40px;
+}
+
+.tour-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.tour-progress {
+  display: flex;
+  gap: 6px;
+  margin: 16px 0;
+}
+
+.tour-progress-dot {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  flex: 1;
+  transition: background .2s ease;
+}
+
+.tour-progress-dot.active {
+  background: var(--primary);
+}
+
+.tour-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.tour-actions .secondary-button:disabled {
+  opacity: .4;
+  cursor: not-allowed;
 }
 
 @media (max-width: 1050px) {
