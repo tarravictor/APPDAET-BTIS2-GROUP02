@@ -1166,16 +1166,8 @@ body.tour-open {
 }
 
 .loader-mark {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #0c66e4, #579dff);
-  display: grid;
-  place-items: center;
-  font-size: 26px;
-  font-weight: 800;
-  color: white;
-  box-shadow: 0 12px 30px rgba(12, 102, 228, .35);
+  font-size: 56px;
+  line-height: 1;
   animation: loader-pop .5s ease;
 }
 
