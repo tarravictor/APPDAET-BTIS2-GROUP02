@@ -1264,6 +1264,26 @@ window.addEventListener("resize", () => {
   if (!tourOverlay.classList.contains("hidden")) showTourStep(tourIndex);
 });
 
+const loader = document.getElementById("loader");
+const LOADER_MIN_MS = 900;
+const LOADER_MAX_MS = 3500;
+const loaderStartedAt = Date.now();
+
+function hideLoader() {
+  const elapsed = Date.now() - loaderStartedAt;
+  const delay = Math.max(0, LOADER_MIN_MS - elapsed);
+  setTimeout(() => {
+    loader.classList.add("loader-hidden");
+    setTimeout(() => {
+      if (loader.parentNode) loader.remove();
+    }, 450);
+  }, delay);
+}
+
+window.addEventListener("load", hideLoader);
+if (document.readyState === "complete") hideLoader();
+setTimeout(hideLoader, LOADER_MAX_MS);
+
 setTimeout(() => {
   if (localStorage.getItem(TOUR_KEY) !== "1") openTour();
 }, 700);
