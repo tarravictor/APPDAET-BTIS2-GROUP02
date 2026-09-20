@@ -289,6 +289,28 @@ button {
   gap: 10px;
 }
 
+.inspired-by {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.atlassian-logo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: #0052cc;
+}
+
 .icon-button, .secondary-button, .primary-button {
   border-radius: 6px;
   height: 36px;
@@ -1335,6 +1357,14 @@ body.dark .tour-highlight {
 
   .topbar {
     padding: 0 14px;
+  }
+
+  .inspired-by {
+    padding: 0 8px;
+  }
+
+  .inspired-by span {
+    display: none;
   }
 
   .breadcrumbs span:first-child,
