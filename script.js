@@ -1134,6 +1134,12 @@ const tourSteps = [
     text: "The Docs section links to your project plan and shared documentation, all in one place."
   },
   {
+    target: "#driveNavItem",
+    align: "right",
+    title: "Drive — uploads",
+    text: "Use Drive to share your project files: upload your Python files (.py) and your documentation (docs.pdf) there so the whole team has everything in one shared folder."
+  },
+  {
     target: "#themeButton",
     align: "bottom",
     title: "Dark mode",
